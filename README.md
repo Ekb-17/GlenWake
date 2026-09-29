@@ -1,5 +1,7 @@
 # GlenWake
 
+See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the staged roadmap, current implementation status, and required validation. The ZIP is milestone 1 only; later AI capabilities remain planned until implemented and tested.
+
 GlenWake is a local workspace for reviewing cleanup recordings. This first milestone lets you upload a video, draw a fixed monitoring area, mark the cleanup start and end, add timestamped observations, save the review, and reopen it. Annotations are **manual**. Automated waste detection, coverage percentages, event attribution and accuracy claims are not implemented yet.
 
 ## Run on Windows in Cursor
