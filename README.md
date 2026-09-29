@@ -29,7 +29,27 @@ Upload an MP4 or WebM recording under 200 MB. MOV upload is supported, but some 
 
 Videos and reviews are stored locally in `backend/data/`. That folder is ignored by Git; do not add private footage to source control. If you delete it, you delete those local sessions. This is a single-user development app; do not expose the API to the public internet.
 
-## Development status
+## Run checks
+
+From the `backend` folder, after creating the virtual environment above:
+
+```powershell
+& ".\.venv\Scripts\python.exe" -m pip install -r requirements-dev.txt
+& ".\.venv\Scripts\python.exe" -m unittest discover -s tests -v
+```
+
+The backend test covers upload, saving and reopening reviews, video streaming/range requests, and rejection of invalid time markers and file extensions. It uses a temporary data folder.
+
+From the `frontend` folder:
+
+```powershell
+npm.cmd ci
+npm.cmd run build
+```
+
+The frontend check compiles TypeScript and creates the production bundle; it does not test browser interactions.
+
+## Implementation status
 
 - `frontend/`: React, TypeScript and Vite review screen.
 - `backend/`: FastAPI, SQLite metadata and local video files.
