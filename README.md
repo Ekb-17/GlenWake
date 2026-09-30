@@ -2,7 +2,9 @@
 
 See [PROJECT_PLAN.md](PROJECT_PLAN.md) for the staged roadmap, current implementation status, and required validation. The ZIP is milestone 1 only; later AI capabilities remain planned until implemented and tested.
 
-GlenWake is a local workspace for reviewing cleanup recordings. This first milestone lets you upload a video, draw a fixed monitoring area, mark the cleanup start and end, add timestamped observations, save the review, and reopen it. Annotations are **manual**. Automated waste detection, coverage percentages, event attribution and accuracy claims are not implemented yet.
+GlenWake is a video-based cleanup evidence and verification project, separate from EarthRelay. Its end goal is to distinguish leftover, moved, newly deposited, and unresolved waste through inspectable evidence, corrections, and reviewed reports. These later capabilities are planned.
+
+The current application is a local workspace for reviewing cleanup recordings. This first milestone lets you upload a video, draw a fixed monitoring area, mark the cleanup start and end, add timestamped observations, save the review, and reopen it. Annotations are **manual**. Automated waste detection, coverage percentages, event attribution and accuracy claims are not implemented yet.
 
 ## Run on Windows in Cursor
 
@@ -55,6 +57,6 @@ The frontend check compiles TypeScript and creates the production bundle; it doe
 
 - `frontend/`: React, TypeScript and Vite review screen.
 - `backend/`: FastAPI, SQLite metadata and local video files.
-- Next milestones: validate real litter segmentation on held-out footage, measure coverage only from verified masks inside the marked area, then add evidence-linked event attribution and revisions. Never infer successful cleanup merely because something left the camera view.
+- Next milestones: validate real litter segmentation on held-out footage, measure coverage only from verified masks inside the marked area, then add evidence-linked event attribution, revisions, reviewed report export, and held-out comparisons. Never infer successful cleanup merely because something left the camera view.
 
 If `python` or `py` is missing on this computer, the explicit Python path above uses the working Python 3.12 install. In PowerShell, `npm.cmd` avoids the `npm.ps1` execution-policy issue. In Command Prompt, use `npm` instead.
