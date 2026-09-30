@@ -1,6 +1,6 @@
 # GlenWake project plan
 
-Updated 2026-09-30 from the user's complete project direction and the [technical source brief](docs/cleanup-verifier-build-plan.md).
+Updated 2026-09-30 from the user's complete project direction and the technical source brief `cleanup-verifier-build-plan (1).md` (kept separately; not copied into this repository).
 
 ## Governing instruction
 
