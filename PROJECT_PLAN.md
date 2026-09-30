@@ -1,10 +1,8 @@
 # GlenWake project plan
 
-Updated 2026-09-30 from the user's complete project direction and the technical source brief `cleanup-verifier-build-plan (1).md` (kept separately; not copied into this repository).
+## Development approach
 
-## Governing instruction
-
-The ZIP is only the first milestone. Build later features in tested stages. Never present planned or experimental AI features as already working.
+The current application implements the first milestone. Build later features in tested stages. Never present planned or experimental AI features as already working.
 
 ## Product and end goal
 
@@ -12,7 +10,7 @@ GlenWake is a video-based cleanup evidence and verification system for campus, s
 
 **What changed during cleanup, and is the waste visible afterward leftover, moved, newly deposited, or impossible to determine from the recording?**
 
-GlenWake is separate from EarthRelay. EarthRelay's image-only constraint does not apply here. ReclaimSight was a temporary name for this same cleanup-verification concept.
+GlenWake is an independent project focused on recorded video.
 
 The contribution to pursue is honest cleanup attribution when video evidence has gaps. For example, a bag visible after cleanup may have remained throughout, moved from elsewhere, or arrived later. If a van blocks the decisive transition, preserve the supported alternatives and mark the attribution unresolved.
 
@@ -51,7 +49,7 @@ Initial scope: uploaded daylight recordings from a stationary camera with separa
 
 Implemented: local video upload/playback UI, monitoring rectangle, cleanup markers, manual timestamped observations, reviewer notes, and save/reopen persistence. Stack: React/TypeScript/Vite, Python/FastAPI, SQLite, local media files.
 
-Verification on 2026-09-29: 1 backend workflow test passed; TypeScript compilation and Vite production build passed. These checks are not complete browser testing, AI evaluation, or Dell performance measurements.
+Baseline verification: 1 backend workflow test passed; TypeScript compilation and Vite production build passed. These checks are not complete browser testing, AI evaluation, or target-device performance measurements.
 
 Not implemented: automatic litter segmentation, coverage calculations, automatic associations/attribution, revision history, and reviewed report export. No application AI accuracy has been measured.
 
@@ -61,14 +59,14 @@ All stages after milestone 1 remain planned. Retain the working manual workflow 
 
 | Stage | Work | Gate before claiming completion |
 | --- | --- | --- |
-| 1 — Manual review | Imported first workspace | Existing API test/build evidence recorded above; browser validation reported separately. |
-| 2 — Data and real vision | Define scenarios and partitions; collect controlled footage; integrate a waste-specific segmentation candidate and association baseline; retain masks, versions, timestamps, and sampling intervals. | Compare masks with independent annotations; exercise failed/unavailable inference; measure missed brief events, runtime and peak RAM. Benchmark on the Dell before making laptop-speed claims. |
+| 1 — Manual review | Manual review workspace | Existing API test/build evidence recorded above; browser validation reported separately. |
+| 2 — Data and real vision | Define scenarios and partitions; collect controlled footage; integrate a waste-specific segmentation candidate and association baseline; retain masks, versions, timestamps, and sampling intervals. | Compare masks with independent annotations; exercise failed/unavailable inference; measure missed brief events, runtime and peak RAM. Benchmark on the target laptop before making laptop-speed claims. |
 | 3 — Visible coverage | Correct endpoint masks and calculate comparable region coverage. | Known-mask and boundary tests; zero baseline, overlaps, occlusion, shifted camera, and incomparable-frame cases; document uncertainty. |
 | 4 — Event history and attribution | Maintain competing origins, blocked-view states, cleanup boundaries, and evidence dependencies. | Paired histories distinguish leftover, moved, later deposits, and unresolved cases. Include tracking-ID switches and false cleanup confirmations. Compare with baselines using identical detections. |
 | 5 — Corrections and revisions | Inspect full evidence, accept/correct/reject suggestions, recompute dependents, preserve earlier assessments and reasons. | Test persistence, revision order, recomputation, provenance, and protection of the original recording and reviewed endpoint. |
 | 6 — Report and evaluation | Export reviewed assessments and evidence references; complete held-out comparisons and a clear demo. | Export matches the selected review revision, retains unresolved cases and limitations, and includes real measurements only. Report failures, coverage of answered cases, and limits of generalization. |
 
-Immediate next stage: data protocol and real vision. The brief references eight original scenario types but does not enumerate all of them; obtain the original experiment brief or document a new proposed scenario list before claiming the original protocol has been reproduced.
+Immediate next stage: data protocol and real vision. Define and document the eight scenario types before collecting the evaluation set; the scenario list is not yet finalized.
 
 ## Technical starting points
 
@@ -82,17 +80,17 @@ Evidence records should include session/time interval/region, candidate type, po
 
 ## Evaluation plan — goals, not results
 
-The source proposes 48 clips: eight scenario types × two takes × three locations. Separate development, tuning, and testing by location, keeping each whole recording and all derivatives within one partition. Include continuous negative footage for false alerts per camera-hour.
+The proposed pilot contains 48 clips: eight scenario types × two takes × three locations. Separate development, tuning, and testing by location, keeping each whole recording and all derivatives within one partition. Include continuous negative footage for false alerts per camera-hour.
 
 Compare snapshot-only, ordinary temporal tracking, and GlenWake attribution on identical detections. Evaluate human-reviewed observations separately from end-to-end model output. Include paired scenes with similar before/after coverage but different histories, plus hidden transitions that should remain unresolved.
 
 Report event precision/recall, wrong old/new attributions, false cleanup confirmations, answered/unresolved fractions, mask coverage error, latency, and peak RAM. Compare attribution errors at equal answered fractions so excessive abstention cannot masquerade as improvement.
 
-Exploratory target from the brief: at least 25% fewer attribution errors than the temporal baseline at the same answered fraction, initially aiming to answer 80% of eligible cases. These are targets, not achieved accuracy or acceptance proof. Set definitions and thresholds before evaluating.
+Exploratory target: at least 25% fewer attribution errors than the temporal baseline at the same answered fraction, initially aiming to answer 80% of eligible cases. These are targets, not achieved accuracy or acceptance proof. Set definitions and thresholds before evaluating.
 
 Review-time savings require a separate counterbalanced human comparison with balanced clips, elapsed time, and correct/wrong/unresolved outcomes; avoid participants learning the same clip in another condition.
 
-The source's synthetic evidence-selection results have not been independently reproduced here and do not establish real-video detection, attribution performance, usability, or originality.
+Synthetic evidence-selection experiments do not establish real-video detection, attribution performance, usability, or originality. Those claims require dedicated evaluation.
 
 ## Development discipline
 
@@ -100,4 +98,4 @@ Read this plan and README before changes. Deliver bounded stages with meaningful
 
 Do not invent outputs or report fixtures as inference. Show model confidence only when meaningful and actually supplied; document calibration limits and distinguish it from measured accuracy. Keep private recordings, local databases, credentials, dependencies, and build output out of Git.
 
-See README for Windows setup and check commands. Source brief setup/access notes and its first-task instruction are historical: this repository and GitHub access already exist, and the manual milestone is implemented.
+See README for Windows setup and check commands.
