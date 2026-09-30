@@ -1,51 +1,103 @@
 # GlenWake project plan
 
+Updated 2026-09-30 from the user's complete project direction and the [technical source brief](docs/cleanup-verifier-build-plan.md).
+
 ## Governing instruction
 
-> The ZIP is only the first milestone. Build the later features in tested stages, and don't present planned AI features as already working.
+The ZIP is only the first milestone. Build later features in tested stages. Never present planned or experimental AI features as already working.
 
-This plan describes the cleanup-recording workspace imported into this repository. The staged roadmap below expands the next milestones already listed in its README. It is not a claim that every feature discussed outside this repository has been captured.
+## Product and end goal
 
-## Current baseline — milestone 1
+GlenWake is a video-based cleanup evidence and verification system for campus, street, park, and property supervisors. Its central question is:
 
-Implemented: local video upload, fixed monitoring rectangle, cleanup start/end markers, manual timestamped observations, reviewer notes, and saving/reopening reviews. The frontend uses React/TypeScript/Vite; the backend uses FastAPI, SQLite, and local video storage.
+**What changed during cleanup, and is the waste visible afterward leftover, moved, newly deposited, or impossible to determine from the recording?**
 
-Validation on 2026-09-29: the existing backend workflow test passed (1 test), and the frontend TypeScript compilation and Vite production build passed. This is limited validation, not a complete browser or AI evaluation.
+GlenWake is separate from EarthRelay. EarthRelay's image-only constraint does not apply here. ReclaimSight was a temporary name for this same cleanup-verification concept.
 
-Not implemented: automated litter segmentation/detection, calculated coverage percentages, automated event attribution, and review revision history. There is no measured AI accuracy to report.
+The contribution to pursue is honest cleanup attribution when video evidence has gaps. For example, a bag visible after cleanup may have remained throughout, moved from elsewhere, or arrived later. If a van blocks the decisive transition, preserve the supported alternatives and mark the attribution unresolved.
 
-## Staged delivery
+A useful product should make review clearer and more efficient. The technical goal is to test whether evidence-aware attribution reduces old-versus-new mistakes compared with ordinary before/after or tracking approaches. Neither that advantage nor review-time savings has been demonstrated by the current application.
 
-All stages after milestone 1 are planned and unimplemented. The acceptance checks below are requirements for future work, not completed checks.
+## Finished workflow — planned beyond the current baseline
 
-| Stage | Deliverable | Required evidence before declaring it working |
+1. Upload a fixed-camera recording, preserve the original, and show analysis progress.
+2. Draw one fixed monitoring region and mark cleanup start/end boundaries.
+3. Overlay visible litter masks from a model validated on litter footage; allow endpoint-mask corrections.
+4. Measure before/after visible litter coverage within the same region only when frames are comparable.
+5. Build timestamped history of appearances, departures from view, movement, blocked views, and uncertain associations.
+6. Attribute remaining waste as leftover, moved, newly deposited, or unresolved. Multiple categories may coexist within one scene.
+7. Inspect supporting frames and timestamps, jump to relevant moments, review full history, correct mistakes, and retain revisions.
+8. Export a reviewed report with assessments, measurements, supporting timestamps, human corrections, conditions, and limitations.
+
+Use a coherent main workspace with video/overlays, an event timeline, and a review panel, plus a compact saved-session list.
+
+Initial scope: uploaded daylight recordings from a stationary camera with separated, clearly visible litter. Night scenes, moving cameras, tiny distant objects, and dense piles are later evaluation extensions.
+
+## Evidence and measurement rules
+
+- A new tracking ID is not evidence of a new deposit. Track IDs are association hypotheses, not proven object identities.
+- Preserve competing origins after occlusion; bound alternatives per ambiguous event rather than enumerating every possible video history.
+- Disappearance or departure from view is not proof of cleanup or proper disposal.
+- Keep the reviewed cleanup endpoint separate from later deposits. New dumping must not silently relabel an earlier cleanup as a failure.
+- Corrected associations must recompute dependent assessments while preserving earlier versions and revision reasons.
+- Keep observations from people, model predictions, rule-derived attribution, coverage, and confidence distinguishable.
+- Coverage = union of waste-mask pixels inside the monitoring region / monitoring-region pixels. Do not substitute bounding-box areas.
+- Relative net reduction = (before coverage - after coverage) / before coverage, only with a nonzero baseline and valid comparison. It may be negative; a zero baseline makes relative reduction undefined.
+- Coverage measures visible projected image area, not garbage mass, disposal quality, or origin. Example percentages are illustrative arithmetic only.
+- Mark measurements unavailable or limited for obstructed views, camera movement, or rearrangements that invalidate comparison. Never fill missing results with plausible numbers.
+- Do not use unsupported accuracy, confidence, real-time, originality, or commercial-readiness claims.
+
+## Current implementation — milestone 1
+
+Implemented: local video upload/playback UI, monitoring rectangle, cleanup markers, manual timestamped observations, reviewer notes, and save/reopen persistence. Stack: React/TypeScript/Vite, Python/FastAPI, SQLite, local media files.
+
+Verification on 2026-09-29: 1 backend workflow test passed; TypeScript compilation and Vite production build passed. These checks are not complete browser testing, AI evaluation, or Dell performance measurements.
+
+Not implemented: automatic litter segmentation, coverage calculations, automatic associations/attribution, revision history, and reviewed report export. No application AI accuracy has been measured.
+
+## Stages and acceptance gates
+
+All stages after milestone 1 remain planned. Retain the working manual workflow throughout.
+
+| Stage | Work | Gate before claiming completion |
 | --- | --- | --- |
-| 1 — Manual review baseline | Imported ZIP workflow | Existing API test and frontend build pass; record browser verification separately when performed. |
-| 2 — Validate litter segmentation | Integrate a real model and retain frame timestamps, model/version, masks, and inference provenance. Preserve manual review. | Evaluate against independently annotated held-out footage; separate recordings across development/evaluation sets; report dataset size, measured segmentation metrics, failures, and runtime. Test unavailable-model and failed-inference behavior. Define acceptance thresholds before evaluating. |
-| 3 — Measure visible coverage | Calculate litter coverage from verified masks within the selected monitoring area; compare suitable before/after frames. | Check known masks and region boundaries; test zero baseline, occlusion, camera movement, and incomparable views. Document numerator, denominator, units, and uncertainty. Withhold results where the comparison is invalid. |
-| 4 — Evidence-linked events | Suggest visible events with timestamp/frame evidence and human confirmation or rejection. | Evaluate on labeled events, including occlusion and objects leaving view; report false positives and missed events. Never treat disappearance alone as proof of successful cleanup or assign responsibility without supporting evidence. |
-| 5 — Revisions | Preserve original evidence and a history of manual corrections and accepted/rejected AI suggestions. | Test save/reopen, revision ordering, provenance preservation, and editing without silently overwriting earlier evidence. |
+| 1 — Manual review | Imported first workspace | Existing API test/build evidence recorded above; browser validation reported separately. |
+| 2 — Data and real vision | Define scenarios and partitions; collect controlled footage; integrate a waste-specific segmentation candidate and association baseline; retain masks, versions, timestamps, and sampling intervals. | Compare masks with independent annotations; exercise failed/unavailable inference; measure missed brief events, runtime and peak RAM. Benchmark on the Dell before making laptop-speed claims. |
+| 3 — Visible coverage | Correct endpoint masks and calculate comparable region coverage. | Known-mask and boundary tests; zero baseline, overlaps, occlusion, shifted camera, and incomparable-frame cases; document uncertainty. |
+| 4 — Event history and attribution | Maintain competing origins, blocked-view states, cleanup boundaries, and evidence dependencies. | Paired histories distinguish leftover, moved, later deposits, and unresolved cases. Include tracking-ID switches and false cleanup confirmations. Compare with baselines using identical detections. |
+| 5 — Corrections and revisions | Inspect full evidence, accept/correct/reject suggestions, recompute dependents, preserve earlier assessments and reasons. | Test persistence, revision order, recomputation, provenance, and protection of the original recording and reviewed endpoint. |
+| 6 — Report and evaluation | Export reviewed assessments and evidence references; complete held-out comparisons and a clear demo. | Export matches the selected review revision, retains unresolved cases and limitations, and includes real measurements only. Report failures, coverage of answered cases, and limits of generalization. |
 
-The immediate next development stage is stage 2. Model selection, evaluation footage, annotation protocol, and acceptance thresholds remain to be specified and recorded before making performance claims. No model, dataset, or target accuracy has been selected by this document.
+Immediate next stage: data protocol and real vision. The brief references eight original scenario types but does not enumerate all of them; obtain the original experiment brief or document a new proposed scenario list before claiming the original protocol has been reproduced.
 
-## Rules for each implementation stage
+## Technical starting points
 
-1. Deliver one bounded stage at a time, retaining the working manual workflow.
-2. Add meaningful tests for the new behavior and its failure cases. Run the backend suite and frontend build for code changes; verify changed browser flows as appropriate.
-3. Record what was implemented, commands run, outcomes, evaluation artifacts, and remaining limitations. A successful build alone is not evidence that AI works.
-4. Update this plan and the README with the actual status: planned, experimental, or implemented and tested. State the scope of testing.
-5. Keep manual observations, model predictions, and calculated measurements distinct in storage and the UI. Preserve source evidence.
-6. Do not substitute mock outputs, hardcoded percentages, or plausible guesses for real inference. Label any test fixtures or demos clearly.
-7. Show confidence only when a real model supplies a meaningful score; document its meaning and calibration limitations. Model confidence is not measured accuracy.
-8. Keep user recordings, local databases, credentials, dependencies, and build output out of source control.
+Keep the existing stack. Add OpenCV/managed FFmpeg media processing when needed. Use one local analysis worker initially to bound memory; record sampling rate and retain original footage for denser reinspection.
 
-## Checks
+YOLO11n-seg adapted to litter is a candidate, not a validated choice. Investigate TACO masks and locally annotated frames; still images alone cannot validate cleanup histories. A waste-specific checkpoint and validation are required. Keep the model behind an interface. ONNX CPU export is a later benchmarked optimization. No mandatory paid per-frame AI API is planned.
 
-From backend after installing requirements-dev.txt:
-`python -m unittest discover -s tests -v`
+Evolve the repository only as needed: API, vision, attribution, and storage modules; experiments for baselines/evaluation; docs for data protocol, model details, and measured limits. Avoid restructuring working code solely to match a proposed layout.
 
-From frontend:
-`npm ci`
-`npm run build`
+Evidence records should include session/time interval/region, candidate type, possible origins, related item hypotheses, frame references, visibility, model and association versions, sampling interval, assertion source, review status, and revision links/reasons.
 
-See README.md for Windows virtual-environment commands.
+## Evaluation plan — goals, not results
+
+The source proposes 48 clips: eight scenario types × two takes × three locations. Separate development, tuning, and testing by location, keeping each whole recording and all derivatives within one partition. Include continuous negative footage for false alerts per camera-hour.
+
+Compare snapshot-only, ordinary temporal tracking, and GlenWake attribution on identical detections. Evaluate human-reviewed observations separately from end-to-end model output. Include paired scenes with similar before/after coverage but different histories, plus hidden transitions that should remain unresolved.
+
+Report event precision/recall, wrong old/new attributions, false cleanup confirmations, answered/unresolved fractions, mask coverage error, latency, and peak RAM. Compare attribution errors at equal answered fractions so excessive abstention cannot masquerade as improvement.
+
+Exploratory target from the brief: at least 25% fewer attribution errors than the temporal baseline at the same answered fraction, initially aiming to answer 80% of eligible cases. These are targets, not achieved accuracy or acceptance proof. Set definitions and thresholds before evaluating.
+
+Review-time savings require a separate counterbalanced human comparison with balanced clips, elapsed time, and correct/wrong/unresolved outcomes; avoid participants learning the same clip in another condition.
+
+The source's synthetic evidence-selection results have not been independently reproduced here and do not establish real-video detection, attribution performance, usability, or originality.
+
+## Development discipline
+
+Read this plan and README before changes. Deliver bounded stages with meaningful behavior/failure tests. For code changes, run backend tests and frontend build plus relevant browser checks; record commands, results, limitations, and actual status (planned, experimental, or implemented and tested).
+
+Do not invent outputs or report fixtures as inference. Show model confidence only when meaningful and actually supplied; document calibration limits and distinguish it from measured accuracy. Keep private recordings, local databases, credentials, dependencies, and build output out of Git.
+
+See README for Windows setup and check commands. Source brief setup/access notes and its first-task instruction are historical: this repository and GitHub access already exist, and the manual milestone is implemented.
