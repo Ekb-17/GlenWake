@@ -53,9 +53,11 @@ Baseline verification: 1 backend workflow test passed; TypeScript compilation an
 
 Not implemented: automatic litter segmentation, coverage calculations, automatic associations/attribution, revision history, and reviewed report export. No application AI accuracy has been measured.
 
+The eight evaluation scenario types and the location-partition rules are defined in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). That document is a collection protocol. No clips have been collected, and it is not model output or a measurement.
+
 ## Stages and acceptance gates
 
-All stages after milestone 1 remain planned. Retain the working manual workflow throughout.
+Stages 2 through 6 are not complete. Retain the working manual workflow throughout. Within stage 2, only the scenario types and partition rules are defined.
 
 | Stage | Work | Gate before claiming completion |
 | --- | --- | --- |
@@ -66,7 +68,7 @@ All stages after milestone 1 remain planned. Retain the working manual workflow 
 | 5 — Corrections and revisions | Inspect full evidence, accept/correct/reject suggestions, recompute dependents, preserve earlier assessments and reasons. | Test persistence, revision order, recomputation, provenance, and protection of the original recording and reviewed endpoint. |
 | 6 — Report and evaluation | Export reviewed assessments and evidence references; complete held-out comparisons and a clear demo. | Export matches the selected review revision, retains unresolved cases and limitations, and includes real measurements only. Report failures, coverage of answered cases, and limits of generalization. |
 
-Immediate next stage: data protocol and real vision. Define and document the eight scenario types before collecting the evaluation set; the scenario list is not yet finalized.
+The scenario list for the pilot is the eight types in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). Stage 2 remains open: no controlled footage has been collected, and no segmentation or association model is integrated. Next work inside this stage is to collect that set under the protocol, then integrate a waste-specific segmentation candidate behind an interface and retain masks, versions, timestamps, and sampling intervals. The stage 2 gate above is still unmet.
 
 ## Technical starting points
 
@@ -80,7 +82,7 @@ Evidence records should include session/time interval/region, candidate type, po
 
 ## Evaluation plan — goals, not results
 
-The proposed pilot contains 48 clips: eight scenario types × two takes × three locations. Separate development, tuning, and testing by location, keeping each whole recording and all derivatives within one partition. Include continuous negative footage for false alerts per camera-hour.
+The proposed pilot contains 48 clips: eight scenario types × two takes × three locations. Those types, the negative-control clip among them, and the location partitions are specified in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). Separate development, tuning, and testing by location, keeping each whole recording and all derivatives within one partition. The negative-control type is the continuous footage for a later false-alert rate.
 
 Compare snapshot-only, ordinary temporal tracking, and GlenWake attribution on identical detections. Evaluate human-reviewed observations separately from end-to-end model output. Include paired scenes with similar before/after coverage but different histories, plus hidden transitions that should remain unresolved.
 

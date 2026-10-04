@@ -1,0 +1,151 @@
+{
+  "catalog_status": "defined_not_collected",
+  "label_source": "human_staging_label",
+  "scope": {
+    "camera": "stationary",
+    "lighting": "daylight",
+    "litter": "separated and clearly visible",
+    "later_extensions": [
+      "night scenes",
+      "moving cameras",
+      "tiny distant objects",
+      "dense piles"
+    ]
+  },
+  "pilot": {
+    "takes_per_type_per_location": 2,
+    "location_count": 3,
+    "planned_clip_count": 48,
+    "collected_clip_count": 0,
+    "partitions": ["development", "tuning", "testing"],
+    "partition_rule": "Assign each of the three locations to exactly one partition before any analysis. Keep each whole recording and all of its derivatives in that location's partition."
+  },
+  "required_record_fields": [
+    "clip_id",
+    "scenario_type",
+    "location_id",
+    "partition",
+    "take",
+    "daylight_confirmed",
+    "stationary_camera_confirmed",
+    "monitoring_region",
+    "cleanup_start_seconds",
+    "cleanup_end_seconds",
+    "item_histories",
+    "frames_comparable",
+    "label_source",
+    "limitations"
+  ],
+  "comparison_pairs": [
+    {
+      "id": "similar_endpoint_coverage",
+      "scenario_ids": ["leftover", "moved"],
+      "instruction": "Stage at least one take of each so visible waste area at the reviewed endpoint can be similar. Coverage must not decide which history is which."
+    },
+    {
+      "id": "item_absent",
+      "scenario_ids": ["visible_removal", "departure_without_removal"],
+      "instruction": "Both end with the item out of the monitoring region. Only a visible removal supports removal. Departure stays unresolved for cleanup and disposal."
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "leftover",
+      "title": "Leftover waste",
+      "primary_question": "Did waste visible after the reviewed endpoint remain in place through cleanup?",
+      "recording_must_show": "One or more separated items stay inside the monitoring region, in the same place, from before cleanup through the reviewed endpoint. The view of those items is not blocked at the endpoint.",
+      "protocol_outcome": "leftover",
+      "supported_statement": "The item remained in place. A later reviewer may call it leftover only from that visible continuity.",
+      "must_not_claim": [
+        "new_track_id_is_new_deposit",
+        "similar_coverage_is_same_history"
+      ]
+    },
+    {
+      "id": "moved",
+      "title": "Moved waste",
+      "primary_question": "Did waste visible after the reviewed endpoint change position during the recording?",
+      "recording_must_show": "An item inside the monitoring region changes position during the cleanup window and is still visible at the reviewed endpoint. The move itself is visible.",
+      "protocol_outcome": "moved",
+      "supported_statement": "The item was relocated and remains visible. Similar endpoint coverage with a leftover clip is not the same history.",
+      "must_not_claim": [
+        "new_track_id_is_new_deposit",
+        "similar_coverage_is_same_history"
+      ]
+    },
+    {
+      "id": "newly_deposited",
+      "title": "Newly deposited waste",
+      "primary_question": "Did waste appear only after the reviewed cleanup endpoint?",
+      "recording_must_show": "The reviewed cleanup endpoint is marked. Waste that was not present at that endpoint appears afterward and is visible. The arrival is after the endpoint, not during an unlabeled gap.",
+      "protocol_outcome": "newly_deposited",
+      "supported_statement": "The later item is newly deposited. The earlier cleanup endpoint stays as reviewed and is not relabeled because waste is visible afterward.",
+      "must_not_claim": [
+        "later_deposit_fails_earlier_cleanup",
+        "new_track_id_is_new_deposit"
+      ]
+    },
+    {
+      "id": "visible_removal",
+      "title": "Visible removal",
+      "primary_question": "Was waste removed from the monitoring region in view during the cleanup window?",
+      "recording_must_show": "An item is inside the region before cleanup. During the cleanup window a person or tool takes it out of the region without the removal being blocked. The item is absent at the reviewed endpoint.",
+      "protocol_outcome": "removal_visible",
+      "supported_statement": "The item is not remaining because the removal was visible. Absence by itself is not the evidence.",
+      "must_not_claim": [
+        "disappearance_confirms_cleanup",
+        "disappearance_confirms_disposal",
+        "waste_mass",
+        "disposal_quality"
+      ]
+    },
+    {
+      "id": "departure_without_removal",
+      "title": "Departure without removal",
+      "primary_question": "Did waste leave the view without a visible removal?",
+      "recording_must_show": "An item that was inside the monitoring region leaves the region or the frame. No pickup or carrying-out is visible. The item is absent afterward.",
+      "protocol_outcome": "unresolved",
+      "supported_statement": "The item left the view. Cleanup and proper disposal are not confirmed.",
+      "must_not_claim": [
+        "disappearance_confirms_cleanup",
+        "disappearance_confirms_disposal"
+      ]
+    },
+    {
+      "id": "occluded_transition",
+      "title": "Occluded transition",
+      "primary_question": "Can the recording support one origin when something blocks the decisive change?",
+      "recording_must_show": "Waste is visible, then a blocker such as a vehicle or person hides the decisive change inside the monitoring region, then the region is visible again. More than one origin remains possible for what is seen afterward.",
+      "protocol_outcome": "unresolved",
+      "supported_statement": "The attribution stays unresolved. Competing origins remain listed. No preferred origin is filled in.",
+      "must_not_claim": [
+        "single_origin_after_occlusion",
+        "filled_measurement"
+      ]
+    },
+    {
+      "id": "association_switch",
+      "title": "Association switch",
+      "primary_question": "Does a changed tracking identity make waste a new deposit?",
+      "recording_must_show": "Two or more similar items are visible in the monitoring region and cross, overlap, or otherwise create a point where a tracker could switch identities.",
+      "protocol_outcome": "follow_visible_continuity_or_unresolved",
+      "supported_statement": "A new tracking ID is not a new deposit. If the recording shows which item is which, the label follows that visible continuity. If it does not, the attribution stays unresolved and the alternatives stay listed.",
+      "must_not_claim": [
+        "new_track_id_is_new_deposit",
+        "single_origin_after_occlusion"
+      ]
+    },
+    {
+      "id": "negative_control",
+      "title": "Negative control",
+      "primary_question": "Does a recording with no litter change stay free of asserted events?",
+      "recording_must_show": "Daylight footage from a stationary camera in which no litter appears, moves, leaves, or is deposited inside the monitoring region for the whole clip.",
+      "protocol_outcome": "no_event",
+      "supported_statement": "No litter event is asserted. This is the continuous negative footage used later for false alerts per camera-hour.",
+      "must_not_claim": [
+        "inferred_event",
+        "filled_measurement"
+      ]
+    }
+  ]
+}

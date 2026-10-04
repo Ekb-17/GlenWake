@@ -57,6 +57,7 @@ The frontend check compiles TypeScript and creates the production bundle; it doe
 
 - `frontend/`: React, TypeScript and Vite review screen.
 - `backend/`: FastAPI, SQLite metadata and local video files.
-- Next milestones: validate real litter segmentation on held-out footage, measure coverage only from verified masks inside the marked area, then add evidence-linked event attribution, revisions, reviewed report export, and held-out comparisons. Never infer successful cleanup merely because something left the camera view.
+- `docs/evaluation/`: the eight scenario types and partition rules for a future 48-clip pilot. No clips are stored in the repository, and the review screen does not use this protocol.
+- Next milestones: collect footage under that protocol, validate real litter segmentation on held-out footage, measure coverage only from verified masks inside the marked area, then add evidence-linked event attribution, revisions, reviewed report export, and held-out comparisons. Never infer successful cleanup merely because something left the camera view.
 
 If `python` or `py` is missing on this computer, the explicit Python path above uses the working Python 3.12 install. In PowerShell, `npm.cmd` avoids the `npm.ps1` execution-policy issue. In Command Prompt, use `npm` instead.
