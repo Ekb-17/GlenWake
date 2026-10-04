@@ -70,6 +70,8 @@ Stages 2 through 6 are not complete. Retain the working manual workflow througho
 
 The scenario list for the pilot is the eight types in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). Stage 2 remains open: no controlled footage has been collected, and no segmentation or association model is integrated. Next work inside this stage is to collect that set under the protocol, then integrate a waste-specific segmentation candidate behind an interface and retain masks, versions, timestamps, and sampling intervals. The stage 2 gate above is still unmet.
 
+Protocol check for this slice: from `backend`, `python -m unittest discover -s tests -v` passed 6 tests (the existing upload/save/reopen test and the scenario-catalog tests). From `frontend`, `npm run build` passed. Frontend source was not changed, and the review screen was not exercised in a browser. These checks do not collect footage, compare masks, or measure a model.
+
 ## Technical starting points
 
 Keep the existing stack. Add OpenCV/managed FFmpeg media processing when needed. Use one local analysis worker initially to bound memory; record sampling rate and retain original footage for denser reinspection.
