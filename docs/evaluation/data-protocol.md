@@ -2,7 +2,7 @@
 
 This protocol names the eight scenario types for the pilot in [PROJECT_PLAN.md](../../PROJECT_PLAN.md). The checked list is [scenario-catalog.json](scenario-catalog.json).
 
-The catalog status is `defined_not_collected`. No evaluation clip has been collected. Nothing in this directory is footage, a mask, a model prediction, a coverage measurement, or an accuracy result. The review application does not read this protocol and does not analyze video.
+The catalog status is `defined_not_collected`. No evaluation clip is stored in this repository, and the catalog collected count remains 0. Nothing in this directory is footage, a mask, a model prediction, a coverage measurement, or an accuracy result. The review screen does not read this protocol and does not analyze video. The evaluation intake API reads the scenario list only to accept or reject a local registration.
 
 ## Pilot shape
 
@@ -103,9 +103,9 @@ These pairs are staging instructions inside the eight types, not extra clips.
 | Similar endpoint coverage | `leftover`, `moved` | Visible area at the endpoint may match. The histories must not. |
 | Item absent | `visible_removal`, `departure_without_removal` | Both can end with the item out of view. Only a visible removal supports removal. |
 
-## What to record when a clip is collected
+## What a registered clip records
 
-Collection has not started. When it does, each clip record needs:
+Intake can store one local recording at a time. The original file stays in the local data directory and is not committed. A `registration_kind` of `fixture` is a dry run or a test registration and is not a collected pilot clip. A `pilot` registration counts only in that local data directory. Intake does not edit `collected_clip_count` in the catalog. Each record needs:
 
 - clip id, scenario type, location id, partition, and take
 - confirmation that the clip is daylight and the camera is stationary
@@ -120,6 +120,6 @@ Do not put private recordings or local databases in Git.
 
 ## What remains outside this slice
 
-Scenario names and partition rules are defined. The rest of stage 2 is not done. Still required before that stage can be called complete: collect the controlled set, integrate a waste-specific segmentation candidate behind an interface, retain masks with model version, timestamps, and sampling interval, compare masks with independent annotations, exercise failed or unavailable inference, and measure missed brief events, runtime, and peak memory. Laptop-speed claims wait on a benchmark of the target laptop.
+Scenario names, partition rules, and local intake are in place. The evaluation footage itself has not been collected. Still required before stage 2 can be called complete: collect the controlled set, integrate a waste-specific segmentation candidate behind an interface, retain masks with model version, timestamps, and sampling interval, compare masks with independent annotations, exercise failed or unavailable inference, and measure missed brief events, runtime, and peak memory. Laptop-speed claims wait on a benchmark of the target laptop. Intake does not do that work and does not produce those measurements.
 
 No coverage is calculated here. Coverage, when it exists later, is the union of waste-mask pixels inside the monitoring region divided by the monitoring-region pixels, and only for comparable frames. A zero before-coverage makes relative reduction undefined. This document does not contain those measurements.

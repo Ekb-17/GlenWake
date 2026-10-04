@@ -53,11 +53,11 @@ Baseline verification: 1 backend workflow test passed; TypeScript compilation an
 
 Not implemented: automatic litter segmentation, coverage calculations, automatic associations/attribution, revision history, and reviewed report export. No application AI accuracy has been measured.
 
-The eight evaluation scenario types and the location-partition rules are defined in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). That document is a collection protocol. No clips have been collected, and it is not model output or a measurement.
+The eight evaluation scenario types and the location-partition rules are defined in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). Local intake can register one recording against one of those types, a take, and one location partition. The original stays in the local data directory. Fixture registrations are not collected pilot clips. The catalog collected count remains 0. No evaluation footage is in the repository, and intake is not model output or a measurement.
 
 ## Stages and acceptance gates
 
-Stages 2 through 6 are not complete. Retain the working manual workflow throughout. Within stage 2, only the scenario types and partition rules are defined.
+Stages 2 through 6 are not complete. Retain the working manual workflow throughout. Within stage 2, the scenario types, partition rules, and local intake are implemented. Controlled footage and a vision model are not.
 
 | Stage | Work | Gate before claiming completion |
 | --- | --- | --- |
@@ -68,9 +68,9 @@ Stages 2 through 6 are not complete. Retain the working manual workflow througho
 | 5 — Corrections and revisions | Inspect full evidence, accept/correct/reject suggestions, recompute dependents, preserve earlier assessments and reasons. | Test persistence, revision order, recomputation, provenance, and protection of the original recording and reviewed endpoint. |
 | 6 — Report and evaluation | Export reviewed assessments and evidence references; complete held-out comparisons and a clear demo. | Export matches the selected review revision, retains unresolved cases and limitations, and includes real measurements only. Report failures, coverage of answered cases, and limits of generalization. |
 
-The scenario list for the pilot is the eight types in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). Stage 2 remains open: no controlled footage has been collected, and no segmentation or association model is integrated. Next work inside this stage is to collect that set under the protocol, then integrate a waste-specific segmentation candidate behind an interface and retain masks, versions, timestamps, and sampling intervals. The stage 2 gate above is still unmet.
+The scenario list for the pilot is the eight types in [docs/evaluation/data-protocol.md](docs/evaluation/data-protocol.md). Local intake is implemented and tested: it accepts one original recording for a known scenario, take, and location partition, and it rejects an unknown scenario, a missing field, or a registration that would put a recording or its derivatives in a second partition. Stage 2 remains open. No controlled footage has been collected, no segmentation or association model is integrated, and masks are not compared. Next work inside this stage is to collect the real set under the protocol, then integrate a waste-specific segmentation candidate behind an interface and retain masks, versions, timestamps, and sampling intervals. The stage 2 gate above is still unmet.
 
-Protocol check for this slice: from `backend`, `python -m unittest discover -s tests -v` passed 6 tests (the existing upload/save/reopen test and the scenario-catalog tests). From `frontend`, `npm run build` passed. Frontend source was not changed, and the review screen was not exercised in a browser. These checks do not collect footage, compare masks, or measure a model.
+Intake check: from `backend`, `python -m unittest discover -s tests -v` passed 12 tests. That run includes the manual review workflow, the scenario catalog, and evaluation intake accept/reject cases. Frontend source was not changed for intake, so the frontend build was not rerun, and the review screen was not changed. These checks do not collect footage, compare masks, or measure a model. The catalog collected count remains 0.
 
 ## Technical starting points
 

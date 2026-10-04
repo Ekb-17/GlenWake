@@ -1,15 +1,22 @@
-"""GlenWake's local, manual video review API."""
+"""GlenWake's local review API.
 
+Session routes are the manual review workspace. Evaluation routes register a
+local recording and do not analyze it.
+"""
+
+import json
 import os
 import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 from uuid import uuid4
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, model_validator
+
+from app.evaluation_intake import evaluation_status, list_clips, original_file, register_clip
 
 DATA_DIR = Path(os.environ.get("GLENWAKE_DATA_DIR", Path(__file__).resolve().parents[1] / "data"))
 VIDEO_DIR = DATA_DIR / "videos"
@@ -168,3 +175,52 @@ def get_video(identity: str):
     if not path.is_file():
         raise HTTPException(404, "Video file missing")
     return FileResponse(path, media_type=ALLOWED[Path(path).suffix], filename=row["filename"], content_disposition_type="inline")
+
+
+async def _read_evaluation_upload(video: UploadFile | None):
+    if video is None or not video.filename:
+        return None
+    try:
+        filename = Path(video.filename).name
+        suffix = Path(filename).suffix.lower()
+        if suffix not in ALLOWED:
+            raise HTTPException(415, "Use an MP4, WebM or MOV video")
+        chunks = []
+        size = 0
+        while chunk := await video.read(1024 * 1024):
+            size += len(chunk)
+            if size > MAX_UPLOAD:
+                raise HTTPException(413, "Video exceeds the 200 MB local upload limit")
+            chunks.append(chunk)
+        payload = b"".join(chunks)
+        if not payload:
+            raise HTTPException(400, "Video is empty")
+        return filename, payload
+    finally:
+        await video.close()
+
+
+@app.get("/api/evaluation/status")
+def get_evaluation_status():
+    return evaluation_status(DB_PATH)
+
+
+@app.get("/api/evaluation/clips")
+def get_evaluation_clips():
+    return list_clips(DB_PATH)
+
+
+@app.post("/api/evaluation/clips", status_code=201)
+async def create_evaluation_clip(record: str = Form(...), video: UploadFile | None = File(None)):
+    try:
+        parsed = json.loads(record)
+    except json.JSONDecodeError as error:
+        raise HTTPException(422, "Evaluation record must be a JSON object") from error
+    upload = await _read_evaluation_upload(video)
+    return register_clip(DATA_DIR, DB_PATH, parsed, upload)
+
+
+@app.get("/api/evaluation/clips/{clip_id}/original")
+def get_evaluation_original(clip_id: str):
+    path = original_file(DATA_DIR, DB_PATH, clip_id)
+    return FileResponse(path, media_type=ALLOWED.get(path.suffix, "application/octet-stream"), filename=path.name, content_disposition_type="inline")
