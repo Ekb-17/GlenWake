@@ -331,6 +331,10 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
   overflow: auto;
 }
 
+.pane-evidence > * {
+  flex-shrink: 0;
+}
+
 .pane-review {
   border-left: 1px solid var(--line);
   padding-left: 18px;
@@ -346,11 +350,17 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
   flex: 1;
 }
 
+.review-scroll > * {
+  flex-shrink: 0;
+}
+
 .card {
   border: 1px solid var(--line);
   background: var(--card);
   border-radius: 10px;
   overflow: hidden;
+  flex-shrink: 0;
+  min-height: min-content;
 }
 
 .card-head {
