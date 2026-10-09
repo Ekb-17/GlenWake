@@ -26,7 +26,8 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
 .desk {
   display: grid;
   grid-template-columns: 268px minmax(0, 1fr);
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   background:
     linear-gradient(180deg, rgba(166, 220, 133, 0.07), transparent 120px),
     var(--turf);
@@ -35,6 +36,8 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
 .pane-sessions {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  height: 100%;
   padding: 24px 16px;
   background: var(--desk);
   border-right: 1px solid var(--line);
@@ -210,8 +213,11 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
 
 .desk-surface {
   min-width: 0;
+  min-height: 0;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .desk-rail {
@@ -309,21 +315,35 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
   display: grid;
   grid-template-columns: minmax(0, 1.7fr) minmax(300px, 0.9fr);
   gap: 18px;
-  align-items: start;
-  padding: 22px 28px 48px;
+  align-items: stretch;
+  padding: 18px 22px 16px;
   flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .pane-evidence,
 .pane-review {
-  display: grid;
-  align-content: start;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
+  min-height: 0;
+  overflow: auto;
 }
 
 .pane-review {
-  position: sticky;
-  top: 12px;
+  border-left: 1px solid var(--line);
+  padding-left: 18px;
+  overflow: hidden;
+}
+
+.review-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 0;
+  overflow: auto;
+  flex: 1;
 }
 
 .card {
@@ -593,7 +613,11 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
   margin-top: 12px;
 }
 
-.save-row { display: flex; }
+.save-row {
+  display: flex;
+  flex-shrink: 0;
+  padding-top: 4px;
+}
 
 .save {
   width: 100%;
@@ -637,14 +661,23 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
 }
 
 @media (max-width: 1100px) {
-  .desk-body { grid-template-columns: 1fr; }
-  .pane-review { position: static; }
+  .desk-body { grid-template-columns: 1fr; overflow: auto; }
+  .pane-review {
+    border-left: 0;
+    padding-left: 0;
+    overflow: visible;
+  }
   .desk-rail { flex-direction: column; align-items: stretch; }
 }
 
 @media (max-width: 760px) {
-  .desk { display: block; }
-  .pane-sessions { width: auto; display: block; padding: 14px; }
+  .desk {
+    display: block;
+    height: auto;
+    overflow: visible;
+  }
+  .desk-surface { height: auto; overflow: visible; }
+  .pane-sessions { width: auto; height: auto; display: block; padding: 14px; }
   .brand { padding: 0 0 10px; }
   .pane-label,
   .sidebar-foot { display: none; }
@@ -656,7 +689,10 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
   }
   .session { min-width: 180px; width: 180px; }
   .desk-rail,
-  .desk-body { padding-left: 16px; padding-right: 16px; }
+  .desk-body { padding-left: 16px; padding-right: 16px; overflow: visible; }
+  .pane-evidence,
+  .pane-review,
+  .review-scroll { overflow: visible; }
   .event-form { grid-template-columns: 1fr; }
   .video-surface { margin: 10px 10px 0; }
   .player-actions { flex-direction: column; align-items: stretch; }

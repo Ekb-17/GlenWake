@@ -192,6 +192,11 @@ export default function App() {
     { id: 'review', label: 'Review', hint: 'Cleanup window and notes' },
   ] as const;
 
+  function pathClass(id: (typeof path)[number]['id']) {
+    if (!active) return id === 'sessions' ? 'path-step current' : 'path-step';
+    return id === 'sessions' ? 'path-step done' : 'path-step current';
+  }
+
   const checks = [
     { label: 'Recording open', done: Boolean(active) },
     { label: 'Monitoring area drawn', done: Boolean(review?.region) },
@@ -267,7 +272,7 @@ export default function App() {
         <header className="desk-rail">
           <nav className="path" aria-label="Review path">
             {path.map((step, index) => (
-              <span key={step.id} className={`path-step ${!active && step.id === 'sessions' ? 'current' : ''} ${active && step.id === 'sessions' ? 'done' : ''} ${active && step.id !== 'sessions' ? 'current' : ''}`}>
+              <span key={step.id} className={pathClass(step.id)}>
                 <span className="path-index">{index + 1}</span>
                 <span className="path-copy">
                   <strong>{step.label}</strong>
@@ -452,6 +457,7 @@ export default function App() {
           </section>
 
           <section className="pane pane-review" aria-label="Review">
+            <div className="review-scroll">
             <div className="pane-kicker">
               <span className="eyebrow">Right · Review</span>
               <h1>Cleanup window and notes</h1>
@@ -520,12 +526,6 @@ export default function App() {
               </div>
             </article>
 
-            <div className="save-row">
-              <button className="save" disabled={busy || !dirty || !review || Boolean(windowInvalid)} onClick={() => void save()}>
-                {busy ? 'Working…' : dirty ? 'Save review' : review ? 'Saved' : 'Nothing to save'}
-              </button>
-            </div>
-
             <div className="guide">
               <span>Evidence to review</span>
               <ol>
@@ -536,6 +536,12 @@ export default function App() {
                 ))}
               </ol>
               <p>Observations under the video are evidence. The right pane is the review of that evidence. Save, then reopen the session from the left to confirm it persisted.</p>
+            </div>
+            </div>
+            <div className="save-row">
+              <button className="save" disabled={busy || !dirty || !review || Boolean(windowInvalid)} onClick={() => void save()}>
+                {busy ? 'Working…' : dirty ? 'Save review' : review ? 'Saved' : 'Nothing to save'}
+              </button>
             </div>
           </section>
         </div>
