@@ -4,6 +4,21 @@ type Region = { x: number; y: number; width: number; height: number };
 type Annotation = { id: string; seconds: number; kind: 'observation' | 'arrival' | 'movement' | 'removal' | 'visibility_gap'; note: string; source: 'manual' };
 type Review = { region: Region | null; start_seconds: number | null; end_seconds: number | null; notes: string; annotations: Annotation[] };
 type Session = { id: string; filename: string; created_at: string; video_url: string; review: Review };
+type AnalysisRecord = {
+  id: string;
+  session_id: string;
+  requested_at: string;
+  status: 'unavailable' | 'failed';
+  reason: string;
+  model_version: null;
+};
+type AnalysisState = {
+  session_id: string;
+  model_configured: boolean;
+  model_integrated: boolean;
+  latest: AnalysisRecord | null;
+  requests: AnalysisRecord[];
+};
 
 const VIDEO_ACCEPT = '.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime';
 
@@ -57,9 +72,11 @@ export default function App() {
   const [note, setNote] = useState('');
   const [kind, setKind] = useState<Annotation['kind']>('observation');
   const [dirty, setDirty] = useState(false);
+  const [analysisState, setAnalysisState] = useState<AnalysisState | null>(null);
   const video = useRef<HTMLVideoElement>(null);
   const surface = useRef<HTMLDivElement>(null);
   const start = useRef<{ x: number; y: number } | null>(null);
+  const analysisLoad = useRef(0);
 
   const select = useCallback((item: Session) => {
     setActive(item);
@@ -69,6 +86,7 @@ export default function App() {
     setStatus('');
     setError('');
     setDrawing(false);
+    setAnalysisState(null);
   }, []);
 
   useEffect(() => {
@@ -79,6 +97,18 @@ export default function App() {
       })
       .catch(e => setError(message(e)));
   }, [select]);
+
+  useEffect(() => {
+    if (!active) return;
+    const token = ++analysisLoad.current;
+    api<AnalysisState>(`/api/sessions/${active.id}/analysis`)
+      .then(state => {
+        if (analysisLoad.current === token) setAnalysisState(state);
+      })
+      .catch(e => {
+        if (analysisLoad.current === token) setError(message(e));
+      });
+  }, [active]);
 
   function change(next: Review) {
     setReview(next);
@@ -101,6 +131,28 @@ export default function App() {
     } catch (e) {
       setError(message(e));
       setStatus('');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function requestAnalysis() {
+    if (!active) return;
+    const token = ++analysisLoad.current;
+    setBusy(true);
+    setError('');
+    try {
+      await api<AnalysisRecord>(`/api/sessions/${active.id}/analysis`, { method: 'POST' });
+      const state = await api<AnalysisState>(`/api/sessions/${active.id}/analysis`);
+      if (analysisLoad.current !== token) return;
+      setAnalysisState(state);
+      setStatus(
+        state.latest?.status === 'failed'
+          ? 'Analysis failed. Nothing was detected, and this review was not changed.'
+          : 'Analysis is unavailable. Nothing was detected, and this review was not changed.',
+      );
+    } catch (e) {
+      if (analysisLoad.current === token) setError(message(e));
     } finally {
       setBusy(false);
     }
@@ -465,8 +517,21 @@ export default function App() {
             </div>
 
             <aside className="unavailable" role="status">
-              <strong>Analysis has not run</strong>
-              <p>Segmentation, coverage, and attribution are not available in this workspace. Do not treat the empty frame as a completed result.</p>
+              <strong>
+                {analysisState?.latest?.status === 'failed'
+                  ? 'Analysis failed'
+                  : analysisState?.latest
+                    ? 'Analysis is unavailable'
+                    : 'Analysis has not run'}
+              </strong>
+              <p>
+                {analysisState?.latest
+                  ? `${analysisState.latest.reason} Requested ${analysisState.latest.requested_at}. Model version absent. No detections, masks, coverage, or confidence were stored.`
+                  : 'No segmentation model is configured. Segmentation, coverage, and attribution are not available. Recording a request stores that analysis is unavailable. It does not detect litter or change this review.'}
+              </p>
+              <button type="button" className="analysis-request" disabled={!active || busy} onClick={() => void requestAnalysis()}>
+                Analysis is unavailable
+              </button>
             </aside>
 
             <article className="card">

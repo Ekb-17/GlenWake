@@ -582,6 +582,21 @@ button:disabled { cursor: not-allowed; opacity: 0.52; }
   color: var(--leaf);
 }
 
+.analysis-request { margin-top: 12px; }
+
+.analysis-request {
+  display: block;
+  width: 100%;
+  border: 1px solid #547456;
+  background: #26392c;
+  color: #c8e7b5;
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: normal;
+}
+
 .marker {
   display: flex;
   justify-content: space-between;
