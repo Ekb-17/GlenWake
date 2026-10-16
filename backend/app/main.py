@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, model_validator
 
+from app.analysis import analysis_state, ensure_table as ensure_analysis_table, record_analysis
 from app.evaluation_intake import evaluation_status, list_clips, original_file, register_clip
 
 DATA_DIR = Path(os.environ.get("GLENWAKE_DATA_DIR", Path(__file__).resolve().parents[1] / "data"))
@@ -77,6 +78,7 @@ def init_db():
             created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
             review TEXT NOT NULL DEFAULT '{}'
         )""")
+        ensure_analysis_table(db)
 
 
 @contextmanager
@@ -165,6 +167,27 @@ def save_review(identity: str, review: Review):
         db.execute("UPDATE sessions SET review = ? WHERE id = ?", (review.model_dump_json(), identity))
         db.commit()
         return session(get_row(db, identity))
+
+
+@app.post("/api/sessions/{identity}/analysis")
+def create_analysis(identity: str):
+    with connection() as db:
+        get_row(db, identity)
+        try:
+            recorded = record_analysis(db, identity)
+        except RuntimeError as error:
+            if str(error) != "Segmentation inference is not implemented":
+                raise
+            raise HTTPException(501, "Analysis is unavailable") from error
+        db.commit()
+        return recorded
+
+
+@app.get("/api/sessions/{identity}/analysis")
+def get_analysis(identity: str):
+    with connection() as db:
+        get_row(db, identity)
+        return analysis_state(db, identity)
 
 
 @app.get("/api/sessions/{identity}/video")
